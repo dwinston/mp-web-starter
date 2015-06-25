@@ -1,0 +1,30 @@
+{% extends "home/templates/base/header_footer.html" %}
+
+{% block page_script %}
+  require(["TasksDetail"], 
+  function(TasksDetail){
+    window.Tasks = new TasksDetail("{{ids|escapejs|safe}}")
+  })
+{% endblock page_script %}
+
+{% block content %}
+<div class="container">
+
+  <ul id='tasks-nav' class="nav nav-pills">
+    {% for task in tasks %}
+      <li class="{% if task.blessed %}blessed{% endif %}">
+        <a href="#{{task.task_id}}">{{task.task_type}}</a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <div class='row detail'></div>
+
+  <script type="text/template" id='ggau-optimize-structure-2x'>
+    {% include "tasks/templates/ggau-optimize-structure-2x.html" %}
+  </script>
+  <script type="text/template" id='ggau-uniform'>
+    {% include "tasks/templates/ggau-uniform.html" %}
+  </script>
+</div>
+{% endblock %}

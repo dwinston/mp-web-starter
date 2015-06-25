@@ -1,0 +1,257 @@
+<hr/>
+<div class='row'>
+  <div class='span6'>
+    <h4>
+      <%= task_type %> 
+      <span class='pull-right label-bg'><%= task_id %></span>
+    </h4>
+  </div>
+</div>
+<hr/>
+<div class='row'>
+  
+  <div class='span6'>
+    <div id='jsmol'></div>
+    <section class="jsmol-controls">
+      <div class="row">
+        <section class="span3" id="structure-picker" class=hidden>
+          <div class="btn-group" data-toggle="buttons">
+            <label class="btn active">
+              <input type="radio" name="options" id="output"> 
+              Output Structure
+            </label>
+            <label class="btn">
+              <input type="radio" name="options" id="input"> 
+              Input Structure
+            </label>
+          </div>
+        </section>
+        <div class="span2 pull-right">
+          <fieldset>
+            <label class="checkbox">
+              <input title='space filling' type="checkbox" value="">
+              <small><strong>Space Filling</strong></small>
+            </label>
+          </fieldset>
+          <fieldset>
+            <label  class="checkbox">
+              <input title='polyhedra' type="checkbox" value="" checked="true">
+              <strong><small>Polyhedra</small></strong>
+            </label>
+          </fieldset>
+        </div>
+      </div>
+    </section>
+
+    <div class='row'>
+      <div class='span3'>
+        <table class="table data" id="spacegroup">
+          <h4><%= _.htmlFormula(pretty_formula) %></h4>
+          <tbody>
+            <tr><td>
+              <h5>Crystal System</h5>
+              <span class="value">
+                <%= spacegroup.crystal_system %>
+              </span>
+            </tr></td>
+            <tr><td>
+              <h5>Hall</h5>
+              <span class="value"><%= spacegroup.hall %></span>
+            </tr></td>
+            <tr><td>
+              <h5>Point Group</h5>
+              <span class="value"><%= spacegroup.point_group %> </span>
+            </tr></td>
+            <tr><td>
+              <h5>Crystal System</h5>
+              <span class="value"><%= spacegroup.crystal_system %></span>
+            </tr></td>
+            <tr><td>
+              <h5>Int. Symbol</h5>
+              <span class="value"><%= _.htmlSpacegroup(spacegroup.symbol) %></span>
+            </tr></td>
+          </tbody>
+        </table>
+      </div>
+
+      <div class='span3'>
+        <table class="table data" id="spacegroup">
+          <h4>Run Statistics</h4>
+          <tbody>
+            <tr><td>
+              <h5>Completed On</h5>
+              <span class="value"><small><%= completed_at %></small></span>
+            </tr></td>
+            <tr><td>
+              <h5>Time for 1st relaxation</h5>
+              <span class="value">
+                <%= run_stats.relax1.Elapsed_time %>
+              </span>
+            </tr></td>
+            <% if (_.has(run_stats, "relax2")) { %>
+            <tr><td>
+              <h5>Time for 2nd relaxation</h5>
+              <span class="value">
+                <%= run_stats.relax2.Elapsed_time %>
+              </span>
+            </tr></td>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class='span6' id='chart1'></div>
+    </div>
+    <div class="row">
+      <div class='span6' id='chart2'></div>
+    </div>
+  </div>
+
+
+  <div id='initial-structures'class="span3">
+    
+    <ul class="nav nav-tabs">
+      <li class="active">
+        <a href="#INCAR" data-toggle="tab">INCAR</a>
+      </li>
+      <li>
+        <a href="#POTCAR" data-toggle="tab">POTCAR</a>
+      </li>
+      <li>
+        <a href="#KPOINTS" data-toggle="tab">KPOINTS</a>
+      </li>
+    </ul>
+    
+    <section class='tab-content calculations'>
+      <div id='INCAR' class='tab-pane active'>
+        <table class="table data fixed">
+          <tbody>
+          <% _.forOwn(incar, function(val, key){ %>
+            <tr><td>
+              <h5><%= key %></h5>
+              <span class="value">
+                <%= _.isArray(val) ? val.join(", ") : val %>
+              </span>
+            </td></tr>
+          <% })%>
+          </tbody>
+        </table>
+      </div>
+      <div id="POTCAR" class='tab-pane'>
+        <table class="table data fixed">
+          <tbody>
+            <thead><th>Labels</th></thead>
+          <% _.each(pseudo_potential.labels, function(psp){ %>
+            <tr>
+              <td><span class="value"><%= psp %></span></td>
+            </tr>           
+          <% })%>
+          </tbody>
+        </table>
+      </div>
+      <div id="KPOINTS" class='tab-pane'>
+        <a href="/tasks/<%= task_id %>/kpoints?download=true" class="btn btn-small typcn typcn-download">
+          Download
+        </a>
+        <table class="table data fixed">
+          <tbody>
+            <tr><td>
+              <h5>Grid</h5>
+              <span class="value">
+              <%= kpoints.generation_style %>
+              </span>
+            </td></tr>            
+            <tr><td>
+              <h5>Divisions</h5>
+              <span class="value">
+              <%= kpointsDivisions %>
+              </span>
+            </td></tr>            
+            <tr><td>
+              <h5>Shift</h5>
+              <span class="value">
+              <%= _.isArray(kpoints.usershift) ? kpoints.usershift.join(", ") : kpoints.usershift %>
+              </span>
+            </td></tr>            
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+  
+
+
+  <div id='final-structures'class="span3">
+
+    <ul class="nav nav-tabs">
+      <li class="active">
+        <a href="#direct" data-toggle="tab">Direct output</a>
+      </li>
+      <li>
+        <a href="#derived" data-toggle="tab">Derived output</a>
+      </li>
+    </ul>
+
+    <section class='tab-content calculations'>
+      <div id='direct' class='tab-pane active'>
+        <table class="table data fixed">
+          <tbody>
+            <tr><td>
+              <h5>Total Energy</h5>
+              <span class="value">
+              <%= output.final_energy.toFixed(3) %> eV
+              </span>
+            </td></tr>            
+            <tr><td>
+              <h5>Energy per atom</h5>
+              <span class="value">
+              <%= output.final_energy_per_atom.toFixed(3) %> eV
+              </span>
+            </td></tr>            
+            <tr><td>
+              <h5>Density</h5>
+              <span class="value">
+              <%= density.toFixed(2) %> g/cm<sup>3</sup>
+              </span>
+            </td></tr>            
+          </tbody>
+        </table>
+      </div>
+
+      <div id='derived' class='tab-pane'>
+        <table class="table data fixed">
+          <tbody>
+            <tr><td>
+              <h5>Formation energy/atom</h5>
+              <span class="value">
+              <%= analysis.formation_energy_per_atom %> eV
+              </span>
+            </td></tr>            
+            <tr><td>
+              <h5>Energy above hull</h5>
+              <span class="value">
+              <%= analysis.e_above_hull %> eV/atom
+              </span>
+            </td></tr>            
+            <tr><td>
+              <h5>Volume Change</h5>
+              <span class="value">
+              <%= analysis.percent_delta_volume %> %
+              </span>
+            </td></tr>            
+            <tr><td>
+              <h5>Decomposes to</h5>
+              <span class="value">
+              <%= analysis.decomposes_to %>
+              </span>
+            </td></tr>            
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+</div>
